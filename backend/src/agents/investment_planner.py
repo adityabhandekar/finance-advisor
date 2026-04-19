@@ -1,24 +1,22 @@
 from crewai import Agent
 
 class InvestmentPlannerAgent:
+    def __init__(self, api_key):
+        from ..llm.gemini_llm import GeminiLLM
+        self.llm = GeminiLLM(api_key) if api_key else None
+    
     def create_agent(self):
         return Agent(
             role="Investment Strategist - Indian Markets",
-            goal="Create personalized investment portfolios for Indian investors in Rupees (₹)",
-            backstory="""You are an experienced investment advisor with expertise in Indian markets, 
-            SEBI regulations, and asset allocation strategies. You recommend Indian investment options:
-            - Equity: Large cap, Mid cap, Small cap mutual funds, Direct stocks
-            - Debt: PPF, EPF, NPS, Corporate bonds, Fixed deposits
-            - Gold: Gold ETFs, Sovereign Gold Bonds
-            - Real Estate: REITs, Property
-            Always use Indian Rupees (₹) and consider Indian tax implications.
-            
-            Provide:
-            1. Asset allocation based on risk profile
-            2. Specific fund recommendations with AMC names
-            3. Expected returns (Indian market context)
-            4. Tax implications under Section 80C, 80D, etc.
-            5. Monthly SIP amounts in ₹""",
+            goal="Create personalized investment portfolios based on market conditions",
+            backstory="""You analyze:
+            - Current market conditions (Gold prices, Stock market, RBI rates)
+            - User risk profile (Conservative, Moderate, Aggressive)
+            - Time horizon for each goal
+            Recommend: Large/Mid/Small cap funds, Debt funds, Gold ETFs, Sovereign Gold Bonds, PPF, NPS.
+            Consider current RBI interest rates, inflation, and market trends.
+            Provide expected returns: Equity 12-15%, Debt 7-8%, Gold 8-10%.""",
+            llm=self.llm,
             verbose=True,
             allow_delegation=True
         )

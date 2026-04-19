@@ -28,13 +28,12 @@ function ExpenseManager({ userId, onExpenseUpdate }) {
         const total = (response.data.expenses || []).reduce((sum, e) => sum + (e.amount || 0), 0);
         setSummary({ total, monthlyTotal: total });
       }
-      if (onExpenseUpdate) onExpenseUpdate();
     } catch (error) {
       console.error('Error fetching expenses:', error);
     } finally {
       setLoading(false);
     }
-  }, [userId, onExpenseUpdate]);
+  }, [userId]);
 
   useEffect(() => {
     if (userId) fetchExpenses();
@@ -67,6 +66,7 @@ function ExpenseManager({ userId, onExpenseUpdate }) {
           payment_method: 'Cash'
         });
         fetchExpenses();
+        if (onExpenseUpdate) onExpenseUpdate();
       }
     } catch (error) {
       toast.error('Failed to add expense');
@@ -79,6 +79,7 @@ function ExpenseManager({ userId, onExpenseUpdate }) {
         await api.delete(`/expenses/${expenseId}`);
         toast.success('Expense deleted successfully!');
         fetchExpenses();
+        if (onExpenseUpdate) onExpenseUpdate();
       } catch (error) {
         toast.error('Failed to delete expense');
       }
@@ -129,7 +130,7 @@ function ExpenseManager({ userId, onExpenseUpdate }) {
           <p className="text-2xl font-bold">₹{summary.total.toLocaleString('en-IN')}</p>
         </div>
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
-          <p className="text-sm opacity-90">Total Transactions</p>
+          <p className="text-sm opacity-90">Transactions</p>
           <p className="text-2xl font-bold">{expenses.length}</p>
         </div>
       </div>
@@ -147,32 +148,32 @@ function ExpenseManager({ userId, onExpenseUpdate }) {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Amount (₹)</label>
-                <input type="number" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="500" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
+                <input type="number" className="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="500" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" value={newExpense.category} onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}>
-                  {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg" value={newExpense.category} onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}>
+                  {categories.map(cat => <option key={cat}>{cat}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
-                <input type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" value={newExpense.date} onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })} />
+                <input type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg" value={newExpense.date} onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" value={newExpense.payment_method} onChange={(e) => setNewExpense({ ...newExpense, payment_method: e.target.value })}>
-                  {paymentMethods.map(method => <option key={method} value={method}>{method}</option>)}
+                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg" value={newExpense.payment_method} onChange={(e) => setNewExpense({ ...newExpense, payment_method: e.target.value })}>
+                  {paymentMethods.map(method => <option key={method}>{method}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
-                <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="e.g., Grocery shopping" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Optional" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
               </div>
             </div>
             <div className="flex justify-end space-x-3 mt-6">
-              <button onClick={() => setShowAddForm(false)} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Cancel</button>
-              <button onClick={handleAddExpense} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Add Expense</button>
+              <button onClick={() => setShowAddForm(false)} className="px-4 py-2 bg-gray-200 rounded-lg">Cancel</button>
+              <button onClick={handleAddExpense} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Add Expense</button>
             </div>
           </div>
         </div>
@@ -180,22 +181,26 @@ function ExpenseManager({ userId, onExpenseUpdate }) {
 
       {/* Expenses List */}
       {loading ? (
-        <div className="text-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div><p className="mt-2 text-gray-500">Loading expenses...</p></div>
+        <div className="text-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div></div>
       ) : expenses.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg"><DollarSign className="h-12 w-12 text-gray-400 mx-auto mb-3" /><p className="text-gray-500">No expenses yet. Click "Add Expense" to get started!</p></div>
+        <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <DollarSign className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-500">No expenses yet. Click "Add Expense" to get started!</p>
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50"><tr><th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Date</th><th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Category</th><th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Description</th><th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Payment</th><th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Amount</th><th className="text-center py-3 px-4 text-sm font-medium text-gray-600">Actions</th></tr></thead>
+            <thead className="bg-gray-50">
+              <tr><th className="text-left py-3 px-4">Date</th><th className="text-left py-3 px-4">Category</th><th className="text-left py-3 px-4">Description</th><th className="text-right py-3 px-4">Amount</th><th className="text-center py-3 px-4">Actions</th></tr>
+            </thead>
             <tbody>
               {expenses.map((expense) => (
-                <tr key={expense._id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="py-3 px-4 text-sm text-gray-600">{expense.date ? new Date(expense.date).toLocaleDateString('en-IN') : 'N/A'}</td>
-                  <td className="py-3 px-4"><span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(expense.category)}`}>{expense.category}</span></td>
-                  <td className="py-3 px-4 text-sm text-gray-600">{expense.description || '-'}</td>
-                  <td className="py-3 px-4 text-sm text-gray-600">{expense.payment_method || 'Cash'}</td>
+                <tr key={expense._id} className="border-b hover:bg-gray-50">
+                  <td className="py-3 px-4 text-sm">{expense.date || 'N/A'}</td>
+                  <td className="py-3 px-4"><span className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(expense.category)}`}>{expense.category}</span></td>
+                  <td className="py-3 px-4 text-sm">{expense.description || '-'}</td>
                   <td className="py-3 px-4 text-sm font-medium text-red-600 text-right">₹{expense.amount.toLocaleString('en-IN')}</td>
-                  <td className="py-3 px-4 text-center"><button onClick={() => handleDeleteExpense(expense._id)} className="text-red-600 hover:text-red-700 transition p-1 hover:bg-red-50 rounded"><Trash2 className="h-4 w-4" /></button></td>
+                  <td className="py-3 px-4 text-center"><button onClick={() => handleDeleteExpense(expense._id)} className="text-red-600 hover:text-red-700"><Trash2 className="h-4 w-4" /></button></td>
                 </tr>
               ))}
             </tbody>

@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 import Goals from './pages/Goals';
 import Investments from './pages/Investments';
 import Navbar from './components/Navbar';
@@ -12,20 +13,16 @@ function App() {
   const token = localStorage.getItem('authToken');
   const isAuthenticated = !!token;
 
-  console.log("App - Is Authenticated:", isAuthenticated);
-
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
         {isAuthenticated && <Navbar />}
         <Toaster position="top-right" />
         <Routes>
-          {/* Public routes */}
           <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
           <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
-          
-          {/* Protected routes */}
           <Route path="/" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+          <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
           <Route path="/goals" element={isAuthenticated ? <Goals /> : <Navigate to="/login" />} />
           <Route path="/investments" element={isAuthenticated ? <Investments /> : <Navigate to="/login" />} />
         </Routes>

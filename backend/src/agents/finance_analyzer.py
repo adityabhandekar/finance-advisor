@@ -1,21 +1,32 @@
 from crewai import Agent
+import google.generativeai as genai
+import os
+
+class GeminiLLM:
+    def __init__(self, api_key, model="gemini-1.5-pro"):
+        genai.configure(api_key=api_key)
+        self.model = genai.GenerativeModel(model)
+    
+    def generate_response(self, prompt):
+        response = self.model.generate_content(prompt)
+        return response.text
+    
+    def __call__(self, prompt):
+        return self.generate_response(prompt)
 
 class FinanceAnalyzerAgent:
+    def __init__(self, api_key):
+        self.llm = GeminiLLM(api_key) if api_key else None
+        
     def create_agent(self):
         return Agent(
             role="Senior Financial Analyst - Indian Market Expert",
-            goal="Analyze user's financial health and provide actionable insights in Indian Rupees (₹)",
-            backstory="""You are an expert financial analyst with 15+ years of experience in Indian personal finance.
-            You specialize in analyzing income statements, expense patterns, and creating comprehensive 
-            financial health reports for Indian users. You understand Indian financial products like PPF, 
-            EPF, NPS, mutual funds, fixed deposits, and Indian tax laws. Always use Indian Rupees (₹) for currency.
-            
-            Provide analysis in this format:
-            1. Financial Health Score (0-100)
-            2. Monthly Savings Analysis in ₹
-            3. Emergency Fund Status (should be 6 months of expenses)
-            4. Debt-to-Income Ratio
-            5. 5 Specific Recommendations for Indian context""",
+            goal="Analyze user's complete financial profile and provide personalized insights",
+            backstory="""You are an expert financial analyst with 20+ years experience in Indian personal finance.
+            You analyze: Income, Expenses, Savings Rate, Debt, Emergency Fund, Investments.
+            You understand Indian financial products: PPF, EPF, NPS, Mutual Funds, Fixed Deposits, Gold Bonds.
+            Always use Indian Rupees (₹). Provide actionable advice based on user's life stage.""",
+            llm=self.llm,
             verbose=True,
             allow_delegation=False
         )

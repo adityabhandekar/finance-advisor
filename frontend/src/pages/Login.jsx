@@ -21,20 +21,26 @@ function Login() {
       console.log("Login response:", response.data);
       
       if (response.data.token && response.data.userId) {
+        // Store auth data
         localStorage.setItem('authToken', response.data.token);
         localStorage.setItem('userId', response.data.userId);
         
-        console.log("Token stored, userId:", response.data.userId);
+        // Store user data for quick access
+        if (response.data.user) {
+          localStorage.setItem('userName', response.data.user.name);
+          localStorage.setItem('userEmail', response.data.user.email);
+        }
+        
         toast.success('Welcome back!');
         
-        // Redirect to root path
-        navigate('/');
+        // Direct redirect without delay
+        window.location.href = '/';
       } else {
         toast.error('Invalid response from server');
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error(error.response?.data?.detail || 'Login failed');
+      toast.error(error.response?.data?.detail || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -64,7 +70,7 @@ function Login() {
                 type="email"
                 required
                 className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="adiii@gmail.com"
+                placeholder="Enter Your Gmail "
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />

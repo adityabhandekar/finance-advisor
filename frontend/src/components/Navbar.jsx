@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Wallet, Home, Target, TrendingUp, LogOut, User, BarChart3, FileText } from 'lucide-react';
+import { Wallet, Home, Target, TrendingUp, LogOut, User, Settings, BarChart3 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 function Navbar() {
@@ -38,18 +38,18 @@ function Navbar() {
                 <TrendingUp className="h-5 w-5" />
                 <span>Investments</span>
               </Link>
-              <Link to="/reports" className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md transition">
-                <FileText className="h-5 w-5" />
-                <span>Reports</span>
+              <Link to="/profile" className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md transition">
+                <User className="h-5 w-5" />
+                <span>Profile</span>
               </Link>
             </div>
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-gray-600">
+            <Link to="/profile" className="flex items-center space-x-2 text-gray-600 hover:text-blue-600">
               <User className="h-5 w-5" />
-              <span className="text-sm hidden md:inline">My Account</span>
-            </div>
+              <span className="hidden md:inline">My Account</span>
+            </Link>
             <button
               onClick={handleLogout}
               className="flex items-center space-x-1 text-red-600 hover:text-red-700 transition"
