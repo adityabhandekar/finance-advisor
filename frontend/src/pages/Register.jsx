@@ -25,12 +25,18 @@ function Register() {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error('Passwords do not match', {
+        duration: 3000,
+        position: 'top-right',
+      });
       return;
     }
 
     if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+      toast.error('Password must be at least 6 characters', {
+        duration: 3000,
+        position: 'top-right',
+      });
       return;
     }
 
@@ -60,12 +66,25 @@ function Register() {
       if (response.data.token) {
         localStorage.setItem('authToken', response.data.token);
         localStorage.setItem('userId', response.data.userId);
-        toast.success('Account created successfully!');
-        navigate('/');
+        
+        // Show success toast
+        toast.success('Account created successfully! Redirecting to dashboard...', {
+          duration: 2000,
+          position: 'top-right',
+        });
+        
+        // Redirect after toast
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
       }
     } catch (error) {
       console.error("Registration error:", error);
-      toast.error(error.response?.data?.detail || 'Registration failed');
+      const errorMsg = error.response?.data?.detail || 'Registration failed. Please try again.';
+      toast.error(errorMsg, {
+        duration: 4000,
+        position: 'top-right',
+      });
     } finally {
       setLoading(false);
     }
